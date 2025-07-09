@@ -38,7 +38,7 @@ def get_pictures():
     """Retrieve all pictures.
 
     Returns:
-        Response: A Flask response object containing the list of pictures 
+        Response: A Flask response object containing the list of pictures
         in JSON format if available, or an empty list with a 200 status code
         if no pictures are found.
     """
@@ -59,8 +59,8 @@ def get_picture_by_id(id):
         id (int): The ID of the picture to retrieve.
 
     Returns:
-        Response: A Flask response object containing the picture data 
-        in JSON format if found, or an error message if the picture 
+        Response: A Flask response object containing the picture data
+        in JSON format if found, or an error message if the picture
         is not found.
     """
     if data:
@@ -69,7 +69,7 @@ def get_picture_by_id(id):
                 if int(picture["id"]) == id:
                     return jsonify(picture), 200
             except (KeyError, ValueError):
-                # Handle the case where 'id' key is missing or cannot 
+                # Handle the case where 'id' key is missing or cannot
                 # be converted to an integer
                 continue
 
@@ -88,7 +88,7 @@ def create_picture():
 
     Returns:
         Response: A Flask response object containing a success message
-        and the new picture data, or an error message if the request 
+        and the new picture data, or an error message if the request
         is invalid.
     """
     # Check if the request contains JSON data
@@ -114,7 +114,11 @@ def create_picture():
 
     # Return a success response with the new picture data
     msg_str = "Picture added successfully"
-    return jsonify({"Message": msg_str, "picture": new_picture, 'id': new_picture['id']}), 201
+    return jsonify({
+                        "Message": msg_str,
+                        "picture": new_picture,
+                        'id': new_picture['id']
+                    }), 201
 
 
 ######################################################################
@@ -125,16 +129,16 @@ def update_picture(id):
     """
     Update a picture in the data list based on the provided ID.
 
-    This function handles PUT requests to update the details of a 
+    This function handles PUT requests to update the details of a
     specific picture. It checks if the request contains valid JSON data,
-    searches for the picture by ID, and updates its details if found. 
+    searches for the picture by ID, and updates its details if found.
     If the picture is not found, it returns a 404 error.
 
     Parameters:
     - id (int): The ID of the picture to update.
 
     Returns:
-    - Response: A Flask response object with a JSON body and appropriate 
+    - Response: A Flask response object with a JSON body and appropriate
                 HTTP status code, whose return status code is:
                 200 if the picture is successfully deleted.
                 400 if the ID is invalid.
@@ -158,7 +162,11 @@ def update_picture(id):
                 picture[key] = request_picture[key]
 
             msg_str = "Picture updated successfully"
-            return jsonify({"Message": msg_str, "picture": picture, 'id': id}), 200
+            return jsonify({
+                                "Message": msg_str,
+                                "picture": picture,
+                                'id': id
+                            }), 200
     else:
         msg_str = f"Picture whose id is {id} not found"
         return jsonify({"Message": msg_str, "picture": request_picture, 'id': id}), 404
@@ -171,15 +179,16 @@ def update_picture(id):
 def delete_picture(id: int):
     """
     Delete a picture from the data list based on the provided ID.
-    This function handles DELETE requests to remove a specific picture by its ID.
-    It checks if the ID is valid, searches for the picture by ID,
-    and removes it if found. If the picture is not found, it returns a 404 error.
+    This function handles DELETE requests to remove a specific picture by
+    its ID. It checks if the ID is valid, searches for the picture by ID,
+    and removes it if found. If the picture is not found, it returns
+    a 404 error.
 
     Parameters:
     - id (int): The ID of the picture to delete.
 
     Returns:
-    - Response: A Flask response object with a JSON body and appropriate 
+    - Response: A Flask response object with a JSON body and appropriate
                 HTTP status code, whose return status code is:
                 200 if the picture is successfully deleted.
                 400 if the ID is invalid.

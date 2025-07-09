@@ -23,4 +23,3 @@ def picture():
         "event_date": "11/2/2030"
     }
     return dict(picture)
-    
