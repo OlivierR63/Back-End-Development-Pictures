@@ -5,4 +5,4 @@ app = Flask(__name__)
 
 # Import routes after creating the app to avoid circular imports
 # This import is necessary to register the routes with the Flask app
-from backend import routes  # noqa: F401
+from backend import routes  # noqa: F401, E402
