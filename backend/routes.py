@@ -169,7 +169,11 @@ def update_picture(id):
                             }), 200
     else:
         msg_str = f"Picture whose id is {id} not found"
-        return jsonify({"Message": msg_str, "picture": request_picture, 'id': id}), 404
+        return jsonify({
+                            "Message": msg_str,
+                            "picture": request_picture,
+                            'id': id
+                        }), 404
 
 
 ######################################################################
