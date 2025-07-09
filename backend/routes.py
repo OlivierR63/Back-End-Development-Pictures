@@ -35,16 +35,41 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    """Retrieve all pictures.
+
+    Returns:
+        Response: A Flask response object containing the list of pictures in JSON format if available,
+                  or an empty list with a 200 status code if no pictures are found.
+    """
+    if data:
+        return jsonify(data), 200
+    else:
+        return jsonify([]), 200
 
 ######################################################################
 # GET A PICTURE
 ######################################################################
-
-
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    """Retrieve a picture by its ID.
+
+    Args:
+        id (int): The ID of the picture to retrieve.
+
+    Returns:
+        Response: A Flask response object containing the picture data in JSON format if found,
+                  or an error message if the picture is not found.
+    """
+    if data:
+        for picture in data:
+            try:
+                if int(picture["id"]) == id:
+                    return jsonify(picture), 200
+            except (KeyError, ValueError):
+                # Handle the case where 'id' key is missing or cannot be converted to an integer
+                continue
+
+    return jsonify({"message": f"Picture with id {id} not found"}), 404
 
 
 ######################################################################
@@ -52,20 +77,105 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    """Create a new picture and add it to the data list.
+
+    Expects:
+        JSON data representing the new picture.
+
+    Returns:
+        Response: A Flask response object containing a success message and the new picture data,
+                  or an error message if the request is invalid.
+    """
+    # Check if the request contains JSON data
+    if not request.is_json:
+        return jsonify({"Message": "Missing JSON in request"}), 400
+
+    # Extract JSON data from the request
+    new_picture = request.get_json()
+
+    # Validate the data (you can add additional validations here)
+    if not new_picture:
+        return jsonify({"Message": "Invalid picture data"}), 400
+    
+    for picture in data:
+        if new_picture['id'] == picture['id']:
+            return jsonify({"Message": f"picture with id {picture['id']} already present", "picture": new_picture, 'id':new_picture['id']}), 302
+
+    # Add the new picture to the data list
+    data.append(new_picture)
+
+    # Return a success response with the new picture data
+    return jsonify({"Message": "Picture added successfully", "picture": new_picture, 'id':new_picture['id']}), 201
 
 ######################################################################
 # UPDATE A PICTURE
 ######################################################################
-
-
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    """
+    Update a picture in the data list based on the provided ID.
+
+    This function handles PUT requests to update the details of a specific picture.
+    It checks if the request contains valid JSON data, searches for the picture by ID,
+    and updates its details if found. If the picture is not found, it returns a 404 error.
+
+    Parameters:
+    - id (int): The ID of the picture to update.
+
+    Returns:
+    - Response: A Flask response object with a JSON body and appropriate HTTP status code.
+               Returns a 200 status code if the picture is successfully updated.
+               Returns a 400 status code if the request does not contain valid JSON data.
+               Returns a 404 status code if the picture with the specified ID is not found.
+    """
+
+    # Check if the request contains JSON data
+    if not request.is_json:
+        return jsonify({"Message": "Missing JSON in request"}), 400
+
+    # Extract JSON data from the request
+    request_picture = request.get_json()
+
+     # Validate the request data
+    if not request_picture or 'id' not in request_picture:
+        return jsonify({"Message": "Invalid data in request"}), 400
+
+    for picture in data:
+        if id == picture['id']:
+            for key in request_picture.keys() :
+                picture[key] = request_picture[key]
+            return jsonify({"Message": "Picture updated successfully", "picture": picture, 'id':id}), 200
+    else:
+        return jsonify({"Message": f"Picture whose id is {id} not found", "picture": request_picture, 'id':id}), 404
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
-def delete_picture(id):
-    pass
+def delete_picture(id: int):
+    """
+    Delete a picture from the data list based on the provided ID.
+
+    This function handles DELETE requests to remove a specific picture by its ID.
+    It checks if the ID is valid, searches for the picture by ID, and removes it if found.
+    If the picture is not found, it returns a 404 error.
+
+    Parameters:
+    - id (int): The ID of the picture to delete.
+
+    Returns:
+    - Response: A Flask response object with a JSON body and appropriate HTTP status code.
+               Returns a 200 status code if the picture is successfully deleted.
+               Returns a 400 status code if the ID is invalid.
+               Returns a 404 status code if the picture with the specified ID is not found.
+    """
+     # Validate the request data
+    if not isinstance(id, int) or id < 0:
+        return jsonify({"Message": "Invalid data in request"}), 400
+    
+    for picture in data:
+        if picture['id'] == id:
+            data.remove(picture)
+            return jsonify({"Message": f"Picture whose id is {id} removed"}), 204
+    
+    return jsonify({"Message": f"Picture whose id is {id} not found"}), 404
